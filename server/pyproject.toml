@@ -1,18 +1,99 @@
 [project]
-name = "genai-stack"
+name = "intelliflow"
 version = "0.1.0"
-description = ""
+description = "IntelliFlow enables developers to design, test, and run AI-driven workflows using a visual canvas powered by React Flow and FastAPI. It connects components such as document knowledge bases, embeddings, and large language models (OpenAI, Gemini) to power dynamic, context-aware chat interfaces — all without writing glue code."
 authors = [
-    {name = "SK Imtiaj Uddin",email = "imtiaj.dev.kol@gmail.com"}
+    {name = "SK Imtiaj Uddin", email = "imtiaj.dev.kol@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "fastapi[standard] (>=0.120.2,<0.121.0)",
+    "uvicorn[standard] (>=0.38.0,<0.39.0)",
+    "sqlalchemy (>=2.0.44,<3.0.0)",
+    "alembic (>=1.17.1,<2.0.0)",
+    "asyncpg (>=0.30.0,<0.31.0)",
+    "pydantic (>=2.12.3,<3.0.0)",
+    "pydantic-settings (>=2.11.0,<3.0.0)",
+    "python-jose[cryptography] (>=3.5.0,<4.0.0)",
+    "passlib[bcrypt] (>=1.7.4,<2.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "loguru (>=0.7.3,<0.8.0) ; python_version >= '3.9' and python_version < '4.0'",
+    "psycopg2 (>=2.9.11,<3.0.0)"
 ]
 
-[tool.poetry]
-packages = [{include = "app", from = "src"}]
+[dependency-groups]
+dev = [
+    "black (>=25.9.0,<26.0.0)",
+    "ruff (>=0.14.0,<0.15.0)",
+    "mypy (>=1.18.2,<2.0.0)",
+    "pre-commit (>=4.3.0,<5.0.0)",
+    "poethepoet (>=0.37.0,<0.38.0)"
+]
+
+[project.urls]
+homepage = "http://localhost:3000/"
+repository = "https://github.com/imtiaj-007/intelliflow.git"
+documentation = "http://localhost:8000/redoc/"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "intelliflow"
+version = "0.1.0"
+description = "IntelliFlow enables developers to design, test, and run AI-driven workflows using a visual canvas powered by React Flow and FastAPI. It connects components such as document knowledge bases, embeddings, and large language models (OpenAI, Gemini) to power dynamic, context-aware chat interfaces — all without writing glue code."
+authors = ["SK Imtiaj Uddin <imtiaj.dev.kol@gmail.com>"]
+package-mode = true
+packages = [{include = "app", from = "src"}]
+
+[tool.poe.tasks]
+format = "black app tests"
+format-check = "black --check app tests"
+lint = "ruff check app tests"
+lint-fix = "ruff check --fix app tests"
+typecheck = "mypy app"
+
+[tool.poe.tasks.check-all]
+sequence = ["format-check", "lint", "typecheck"]
+ignore_fail = false
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | alembic
+  | data
+  | uploads
+)/
+'''
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+python_version = "3.12"
+strict = false
+warn_return_any = false
+warn_unused_configs = true
+show_error_codes = true
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_reexport = true
+disallow_any_generics = false
+follow_imports = "silent"
+exclude = ["alembic/", "tests/", "data/", "uploads"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+warn_required_dynamic_aliases = true
