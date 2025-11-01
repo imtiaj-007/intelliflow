@@ -40,6 +40,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         session_id = cookies.get(self.SESSION_ID_COOKIE)
         authorized = False
         new_access_token = None
+        user_id = None
 
         # If all auth cookies are missing and not a public route: unauthorized
         if (not access_token and not refresh_token and not session_id) and not self.is_public_path(
@@ -48,8 +49,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 {"detail": "Unauthorized: Missing authentication cookies."}, status_code=401
             )
-
-        user_id = None
 
         if access_token:
             try:
@@ -92,6 +91,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         if not authorized:
             return JSONResponse({"detail": "Unauthorized."}, status_code=401)
+
+        # Add user_id to request headers for access in endpoints
+        if user_id:
+            request.scope["headers"].append((b"x-user-id", str(user_id).encode()))
 
         response = await call_next(request)
 

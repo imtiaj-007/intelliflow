@@ -7,6 +7,12 @@ from pydantic import BaseModel, Field
 from app.schema.enums import FileStatus, MIMEType
 
 
+class FileUploadRequest(BaseModel):
+    file_name: str
+    file_size: int
+    file_ext: str
+
+
 class FileMetadata(BaseModel):
     extension: str
     mime_type: MIMEType

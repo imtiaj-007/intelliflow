@@ -26,7 +26,6 @@ class EmbeddingVector(BaseModel):
     """Represents a single text chunk and its vector embedding."""
 
     chunk_index: int = Field(..., ge=0, description="Position in original chunks list")
-    vector: list[float] = Field(..., min_length=1, description="Embedding vector")
     text: str = Field(..., min_length=1, description="Original chunk text")
 
     @field_validator("vector")
