@@ -35,11 +35,9 @@ class MIMEType(str, Enum):
     PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
 
-class DocStatus(str, Enum):
-    """Enum representing uploaded document status."""
+class FileStatus(str, Enum):
+    """Enum representing current file status."""
 
     UPLOADED = "uploaded"
-    PARSED = "parsed"
     EMBEDDED = "embedded"
-    READY = "ready"
     FAILED = "failed"

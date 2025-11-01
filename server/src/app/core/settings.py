@@ -121,6 +121,10 @@ class Settings(BaseSettings):
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
+    @property
+    def CHROMA_STORAGE_PATH(self) -> str:
+        return f"{self.BASE_DIR}/data/chromadb"
+
     # Configure the location of the .env file (based on environment)
     model_config = SettingsConfigDict(
         env_file=".env.development", case_sensitive=False, extra="ignore"

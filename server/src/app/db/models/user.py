@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import ConfigDict
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
@@ -9,6 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
 from app.schema.enums import UserRole
+
+if TYPE_CHECKING:
+    from app.db.models.file import File
+    from app.db.models.workflow import Workflow
 
 
 class User(Base):
@@ -60,11 +64,10 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(
         String(100),
-        default=None,
         nullable=False,
         unique=True,
         index=True,
-        comment="User's email address (unique but optional).",
+        comment="User's email address (unique).",
     )
     password: Mapped[str] = mapped_column(
         String(255),
@@ -105,6 +108,12 @@ class User(Base):
 
     # Relationships
     user_sessions: Mapped[list["UserSession"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    workflows: Mapped[list["Workflow"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    files: Mapped[list["File"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
 
@@ -154,7 +163,7 @@ class UserSession(Base):
         default=None,
         nullable=False,
         index=True,
-        comment="ID of the user who owns the session (optional).",
+        comment="ID of the user who owns the session.",
     )
     session_token: Mapped[str] = mapped_column(
         String(),
