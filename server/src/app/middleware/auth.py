@@ -60,7 +60,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # Case 1: No access token but have refresh token and session ID
         if not access_token and refresh_token and session_id:
             refresh_decoded = self._decode_token(refresh_token, refresh=True)
-            print(f"Refresh payload: {refresh_decoded}")
             if refresh_decoded and refresh_decoded.get("session_id") == session_id:
                 user_id = refresh_decoded.get("sub") or refresh_decoded.get("user_id")
                 if user_id:

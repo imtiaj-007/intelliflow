@@ -30,8 +30,8 @@ class SecurityConfig:
 
     # JWT configuration
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES or 15      # [15 minutes]
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = settings.REFRESH_TOKEN_EXPIRE_MINUTES or 10080 # [7 days]
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES or 60
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = settings.REFRESH_TOKEN_EXPIRE_MINUTES or 10080  # [7 days]
 
     # Security headers and CORS settings
     CORS_ORIGINS: List[str] = settings.CORS_ORIGINS.split(",") or [settings.FRONTEND_BASE_URL]
@@ -44,7 +44,7 @@ class SecurityConfig:
 
     # Rate limiting
     RATE_LIMIT_REQUESTS: int = 100
-    RATE_LIMIT_WINDOW: int = 900    # 15 minutes in seconds
+    RATE_LIMIT_WINDOW: int = 900  # 15 minutes in seconds
 
     @classmethod
     def get_secret_key(cls) -> str:

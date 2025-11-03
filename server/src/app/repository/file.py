@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -86,6 +86,33 @@ class FileRepository:
             log.error(f"Unknown error getting file by id: {e}")
             raise
 
+    async def get_file_by_workflow_id(self, workflow_id: uuid.UUID) -> Optional[File]:
+        """
+        Retrieve a file record by its associated workflow identifier.
+
+        Args:
+            workflow_id (uuid.UUID): The UUID of the workflow to search for files
+
+        Returns:
+            Optional[File]: The File object if found, None if no file exists with the given workflow ID
+
+        Raises:
+            SQLAlchemyError: If there's a database error during the operation
+            Exception: If any other unexpected error occurs during the operation
+        """
+        try:
+            q = select(File).where(File.workflow_id == workflow_id)
+            res = await self.session.execute(q)
+            return res.scalar_one_or_none()
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            log.error(f"Database error getting file by workflow_id: {e}")
+            raise
+        except Exception as e:
+            await self.session.rollback()
+            log.error(f"Unknown error getting file by workflow_id: {e}")
+            raise
+
     async def get_user_files(self, user_id: uuid.UUID) -> Sequence[File]:
         """
         Retrieve all files belonging to a specific user.
@@ -111,6 +138,7 @@ class FileRepository:
             await self.session.rollback()
             log.error(f"Unknown error getting user files: {e}")
             raise
+        
 
     async def save_embeddings(
         self,

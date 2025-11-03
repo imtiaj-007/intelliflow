@@ -1,7 +1,18 @@
 from datetime import datetime
-from typing import Optional
+from typing import Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel
+
+T = TypeVar("T")
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    """A generic model for paginated API responses."""
+
+    data: List[T]
+    current_page: int
+    total_pages: int
+    total_records: int
 
 
 class SystemInfo(BaseModel):
@@ -90,8 +101,3 @@ class LogOptions(BaseModel):
     compression: str
     serialize: bool
     catch: bool
-
-
-class AppCookies(BaseModel):
-    _sid: str
-    _uid: str

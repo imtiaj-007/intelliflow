@@ -90,6 +90,7 @@ async def login_user(
         response=response,
         cookie_name="_intelliflow_access_token",
         cookie_value=auth_result.access_token,
+        expiry=1440,
     )
     set_app_cookie(
         response=response,

@@ -11,6 +11,7 @@ class FileUploadRequest(BaseModel):
     file_name: str
     file_size: int
     file_ext: str
+    workflow_id: str
 
 
 class FileMetadata(BaseModel):

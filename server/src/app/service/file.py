@@ -71,6 +71,7 @@ class FileService:
             )
             file = FileCreate(
                 user_id=user_id,
+                workflow_id=file.workflow_id,
                 filename=file.file_name,
                 s3_key=presigned_response.file_key,
                 file_metadata=FileMetadata(
