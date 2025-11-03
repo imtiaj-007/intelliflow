@@ -1,4 +1,5 @@
 import Header from '@/components/layout/Header'
+import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
@@ -29,6 +30,7 @@ export default function RootLayout({
                     geist.className,
                     'antialiased flex flex-col h-screen'
                 )}>
+                <Toaster richColors />
                 <Header />
                 <main className='flex-1 bg-gray-100'>{children}</main>
             </body>

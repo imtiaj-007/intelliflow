@@ -1,7 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useApp } from '@/context/AppContext'
 import { useDnD } from '@/context/DnDContext'
 import {
     Background,
@@ -47,6 +49,7 @@ function DnDFlow() {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
     const { screenToFlowPosition } = useReactFlow()
     const [type] = useDnD()
+    const { workflowStatus, processFile, loading } = useApp()
 
     const onConnect = useCallback(
         (params: Connection) => setEdges(eds => addEdge(params, eds)),
@@ -124,24 +127,30 @@ function DnDFlow() {
             </ReactFlow>
             <div className='absolute bottom-8 right-4 flex flex-col gap-3'>
                 <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger>
                         <Button
                             size='icon-lg'
-                            className='rounded-full'>
-                            <PlayIcon
-                                className='size-5'
-                                fill='white'
-                            />
+                            className='rounded-full'
+                            onClick={processFile}>
+                            {loading.processing ? (
+                                <Spinner />
+                            ) : (
+                                <PlayIcon
+                                    className='size-5'
+                                    fill='white'
+                                />
+                            )}
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side='left'>Build Workflow</TooltipContent>
                 </Tooltip>
                 <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger>
                         <Button
                             variant='primary'
                             size='icon-lg'
-                            className='rounded-full'>
+                            className='rounded-full'
+                            disabled={!workflowStatus}>
                             <MessageCircleMoreIcon
                                 className='size-5'
                                 fill='white'
