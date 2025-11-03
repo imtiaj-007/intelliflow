@@ -76,9 +76,7 @@ class Workflow(Base):
     nodes: Mapped[List["WorkflowNode"]] = relationship(
         back_populates="workflow", cascade="all, delete-orphan", passive_deletes=True
     )
-    files: Mapped[List["File"]] = relationship(
-        back_populates="workflow", cascade="all, delete-orphan", passive_deletes=True
-    )
+    files: Mapped[List["File"]] = relationship(back_populates="workflow")
 
 
 class WorkflowNode(Base):

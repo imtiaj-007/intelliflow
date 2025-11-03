@@ -64,15 +64,22 @@ class S3Manager:
             throughout the application lifecycle, improving performance and connection
             management.
         """
-        if self._client is None:
-            self._client = boto3.client(
-                "s3",
-                region_name=self.config.region,
-                aws_access_key_id=self.config.aws_access_key,
-                aws_secret_access_key=self.config.aws_secret_key,
-                config=Config(signature_version="s3v4"),
+        try:
+            if self._client is None:
+                self._client = boto3.client(
+                    "s3",
+                    region_name=self.config.region,
+                    aws_access_key_id=self.config.aws_access_key,
+                    aws_secret_access_key=self.config.aws_secret_key,
+                    config=Config(signature_version="s3v4"),
+                )
+            return self._client
+        except Exception as e:
+            log.error(f"Error creating S3 client: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to initialize S3 client",
             )
-        return self._client
 
     def _validate_file_params(self, filename: str, file_size: Optional[int] = None) -> FileMetadata:
         """
@@ -96,31 +103,37 @@ class S3Manager:
                 file extension is not allowed, or no MIME type mapping exists
             HTTPException: If file size exceeds the configured maximum limit (413 status)
         """
-        if not filename:
-            raise ValueError("Filename must not be empty")
+        try:
+            if not filename:
+                raise ValueError("Filename must not be empty")
 
-        if not self.SAFE_FILENAME_REGEX.match(filename):
-            raise ValueError("Invalid filename format")
+            if not self.SAFE_FILENAME_REGEX.match(filename):
+                raise ValueError("Invalid filename format")
 
-        file_path = Path(filename)
-        ext = file_path.suffix.lower()
+            file_path = Path(filename)
+            ext = file_path.suffix.lower()
 
-        if ext not in self.ALLOWED_EXTENSIONS:
-            raise ValueError(
-                f"Unsupported file extension for {ext}. Allowed: {self.ALLOWED_EXTENSIONS}"
-            )
+            if ext not in self.ALLOWED_EXTENSIONS:
+                raise ValueError(
+                    f"Unsupported file extension for {ext}. Allowed: {self.ALLOWED_EXTENSIONS}"
+                )
 
-        mime_type = self.MIME_TYPES[ext]
-        if mime_type is None:
-            raise ValueError(f"Unsupported mime type for {ext}")
+            mime_type = self.MIME_TYPES.get(ext)
+            if mime_type is None:
+                raise ValueError(f"Unsupported mime type for {ext}")
 
-        if file_size and file_size > self.MAX_FILE_SIZE:
-            raise HTTPException(
-                status_code=status.HTTP_413_CONTENT_TOO_LARGE,
-                detail=f"File size should be within {self.MAX_FILE_SIZE / 1048576}MB",
-            )
+            if file_size and file_size > self.MAX_FILE_SIZE:
+                raise HTTPException(
+                    status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                    detail=f"File size should be within {self.MAX_FILE_SIZE / 1048576}MB",
+                )
 
-        return FileMetadata(extension=ext, mime_type=MIMEType[mime_type], size=file_size)
+            return FileMetadata(extension=ext, mime_type=MIMEType(mime_type), size=file_size)
+        except HTTPException:
+            raise
+        except Exception as e:
+            log.error(f"Error validating file parameters: {str(e)}")
+            raise ValueError(f"File validation failed: {str(e)}")
 
     def _build_file_key(self, filename: str) -> str:
         """
@@ -136,14 +149,18 @@ class S3Manager:
         Returns:
             str: Unique S3 file key in the format 'folder/base_timestamp.extension'
         """
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_path = Path(filename)
-        base = file_path.stem
-        ext = file_path.suffix
-        unique_filename = f"{base}_{timestamp}{ext}"
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_path = Path(filename)
+            base = file_path.stem
+            ext = file_path.suffix
+            unique_filename = f"{base}_{timestamp}{ext}"
 
-        # Sanitize folder path and convert to S3-compatible format
-        return f"{self.UPLOAD_FOLDER}/{unique_filename}"
+            # Sanitize folder path and convert to S3-compatible format
+            return f"{self.UPLOAD_FOLDER}/{unique_filename}"
+        except Exception as e:
+            log.error(f"Error building file key for {filename}: {str(e)}")
+            raise ValueError(f"Failed to generate file key: {str(e)}")
 
     def download_file(self, file_key: str) -> bytes:
         """

@@ -112,9 +112,7 @@ class File(Base):
     embeddings: Mapped[list["FileEmbedding"]] = relationship(
         back_populates="file", cascade="all, delete-orphan", passive_deletes=True
     )
-    workflow: Mapped["Workflow"] = relationship(
-        back_populates="files", cascade="all, delete-orphan", passive_deletes=True
-    )
+    workflow: Mapped["Workflow"] = relationship(back_populates="files")
 
 
 class FileEmbedding(Base):

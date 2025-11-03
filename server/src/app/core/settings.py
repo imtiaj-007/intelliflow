@@ -103,7 +103,7 @@ class Settings(BaseSettings):
     # Security Variables
     JWT_SECRET_KEY: str
     JWT_REFRESH_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
 
     # Global Variables

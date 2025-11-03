@@ -88,7 +88,7 @@ async def login_user(
 
     set_app_cookie(
         response=response,
-        cookie_name="_inteliflow_access_token",
+        cookie_name="_intelliflow_access_token",
         cookie_value=auth_result.access_token,
     )
     set_app_cookie(

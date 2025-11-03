@@ -91,29 +91,6 @@ def create_jwt_token(
     return encoded_jwt
 
 
-def decode_jwt_token(
-    token: str, secret_key: str | None = None, algorithms: list[str] | None = None
-) -> dict[str, Any]:
-    """
-    Decode a JWT token and return its payload.
-    Args:
-        token: The JWT token string.
-        secret_key: Secret key for verifying (defaults to settings).
-        algorithms: Allowed algorithms (defaults to settings).
-    Returns:
-        The decoded payload dict.
-    Raises:
-        jose.JWTError if invalid.
-    """
-    key = secret_key or SecurityConfig.SECRET_KEY
-    allowed_algorithms = algorithms or [SecurityConfig.ALGORITHM]
-    try:
-        payload = jwt.decode(token, key, algorithms=allowed_algorithms)
-        return payload
-    except JWTError:
-        raise
-
-
 def create_access_token(subject: str, extra_data: dict = None) -> str:
     """
     Create an access token (short-lived) for a subject (user id/email).
