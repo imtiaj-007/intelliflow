@@ -1,3 +1,5 @@
+'use client'
+
 import { useDnD } from '@/context/DnDContext'
 import { BookOpen, Brain, Code, MessageSquare } from 'lucide-react'
 

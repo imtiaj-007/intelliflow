@@ -136,4 +136,72 @@
     h3 {
         @apply text-base md:text-lg lg:text-xl font-medium;
     }
+
+    .markdown {
+        h1 {
+            @apply text-2xl font-bold mb-4;
+
+            + h2 {
+                @apply mt-2;
+            }
+        }
+
+        h2 {
+            @apply text-xl font-semibold mb-3;
+
+            + h3 {
+                @apply mt-2;
+            }
+        }
+
+        h3 {
+            @apply text-lg font-medium mb-2;
+        }
+
+        p {
+            @apply my-3;
+
+            + ul,
+            + ol {
+                @apply mt-2;
+            }
+        }
+
+        ul,
+        ol {
+            @apply mb-4 pl-6;
+
+            li {
+                @apply mb-2;
+
+                + li {
+                    @apply mt-2;
+                }
+            }
+        }
+
+        blockquote {
+            @apply border-l-4 border-muted-foreground/30 pl-4 py-2 mb-4 italic;
+
+            p {
+                @apply mb-0;
+            }
+        }
+
+        code {
+            @apply bg-muted px-1 py-0.5 rounded text-sm;
+
+            &:not(pre code) {
+                @apply inline;
+            }
+        }
+
+        pre {
+            @apply bg-muted p-2 mb-4 overflow-x-auto rounded-lg;
+
+            code {
+                @apply bg-transparent p-0;
+            }
+        }
+    }
 }

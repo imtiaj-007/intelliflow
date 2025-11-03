@@ -1,5 +1,6 @@
 'use client'
 
+import ChatCanvas from '@/components/chat/ChatCanvas'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -23,7 +24,7 @@ import {
     useViewport,
 } from '@xyflow/react'
 import { MessageCircleMoreIcon, PlayIcon } from 'lucide-react'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { nodeTypes } from './nodes/types'
 
 function CustomControls() {
@@ -43,13 +44,21 @@ function CustomControls() {
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
 
-function DnDFlow() {
+function DnDFlow({ workflowId }: { workflowId: string }) {
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
     const { screenToFlowPosition } = useReactFlow()
     const [type] = useDnD()
-    const { workflowStatus, processFile, loading } = useApp()
+    const { workflow, workflowStatus, processFile, loading } = useApp()
+
+    useEffect(() => {
+        workflow[1]({
+            title: '',
+            description: '',
+            id: workflowId,
+        })
+    }, [workflowId])
 
     const onConnect = useCallback(
         (params: Connection) => setEdges(eds => addEdge(params, eds)),
@@ -146,16 +155,17 @@ function DnDFlow() {
                 </Tooltip>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button
-                            variant='primary'
-                            size='icon-lg'
-                            className='rounded-full'
-                            disabled={!workflowStatus}>
-                            <MessageCircleMoreIcon
-                                className='size-5'
-                                fill='white'
-                            />
-                        </Button>
+                        <ChatCanvas>
+                            <Button
+                                variant='primary'
+                                size='icon-lg'
+                                className='rounded-full'>
+                                <MessageCircleMoreIcon
+                                    className='size-5'
+                                    fill='white'
+                                />
+                            </Button>
+                        </ChatCanvas>
                     </TooltipTrigger>
                     <TooltipContent side='left'>Run Workflow</TooltipContent>
                 </Tooltip>
@@ -164,10 +174,14 @@ function DnDFlow() {
     )
 }
 
-const FlowCanvas: React.FC = () => {
+interface FlowCanvasProps {
+    workflowId: string
+}
+
+const FlowCanvas: React.FC<FlowCanvasProps> = ({ workflowId }) => {
     return (
         <ReactFlowProvider>
-            <DnDFlow />
+            <DnDFlow workflowId={workflowId} />
         </ReactFlowProvider>
     )
 }
