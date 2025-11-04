@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
 
     # Root directory and URLs
-    BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     PUBLIC_ROUTES: set[str] = {
         "/",
         "/health",

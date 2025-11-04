@@ -1,0 +1,83 @@
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        PYTHON_VERSION: 3.12
+        POETRY_VERSION: 2.2.0
+        USER_ID: 1000
+        GROUP_ID: 1000
+    container_name: intelliflow-backend
+    restart: unless-stopped
+    environment:
+      # Application
+      APP_ENV: ${APP_ENV:-production}
+      DEBUG: ${DEBUG:-false}
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/logs:/app/logs
+      - ./server/data:/app/data
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: intelliflow-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - app-network
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: app-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+    profiles:
+      - production  # Only starts with --profile production
+
+networks:
+  app-network:
+    driver: bridge
