@@ -52,8 +52,8 @@ name = "intelliflow"
 version = "0.1.0"
 description = "IntelliFlow enables developers to design, test, and run AI-driven workflows using a visual canvas powered by React Flow and FastAPI. It connects components such as document knowledge bases, embeddings, and large language models (OpenAI, Gemini) to power dynamic, context-aware chat interfaces — all without writing glue code."
 authors = ["SK Imtiaj Uddin <imtiaj.dev.kol@gmail.com>"]
-package-mode = true
-packages = [{include = "app", from = "src"}]
+package-mode = false
+packages = [{include = "app"}]
 
 [tool.poe.tasks]
 format = "black app tests"

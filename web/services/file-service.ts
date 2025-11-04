@@ -6,6 +6,7 @@ export interface UploadDocument {
     file_size: number
     file_ext: string
     mime_type: string
+    workflow_id: string
 }
 
 export interface UploadDocumentResponse {
@@ -14,15 +15,6 @@ export interface UploadDocumentResponse {
     file_key: string
     mime_type: string
     expires_in: number
-}
-
-export interface ProcessDocumentResponse {
-    document_id: string
-    embeddings: {
-        chunk_index: number
-        vector: number[]
-        text: string
-    }[]
 }
 
 export interface APIResponse<T> {
@@ -67,9 +59,12 @@ export const FileService = {
             return false
         }
     },
-    processDocument: async (file_id: string): Promise<APIResponse<ProcessDocumentResponse>> => {
+    processDocument: async (
+        file_id: string,
+        workflow_id: string
+    ): Promise<APIResponse<unknown>> => {
         try {
-            const res = await axiosClient.post(`/file/${file_id}/process`)
+            const res = await axiosClient.post(`/file/${file_id}/process`, { workflow_id })
             return res
         } catch (error) {
             return {

@@ -1,34 +1,12 @@
+import { CreateWorkflowModal } from '@/components/modals/CreateWorkflow'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import type { WorkflowResponse } from '@/services/workflow-service'
 import { ExternalLink, Plus } from 'lucide-react'
-
-async function getWorkflows() {
-    return Promise.resolve([
-        {
-            id: '001',
-            title: 'Chat With AI',
-            description: 'Chat with a smart AI',
-        },
-        {
-            id: '002',
-            title: 'Chat With AI',
-            description: 'Chat with a smart AI',
-        },
-        {
-            id: '003',
-            title: 'Chat With AI',
-            description: 'Chat with a smart AI',
-        },
-        {
-            id: '004',
-            title: 'Chat With AI',
-            description: 'Chat with a smart AI',
-        },
-    ])
-}
+import Link from 'next/link'
 
 export default async function Home() {
-    const workflows = await getWorkflows()
+    const workflows: WorkflowResponse[] = []
 
     return (
         <section
@@ -41,23 +19,25 @@ export default async function Home() {
                     New Stack
                 </Button>
             </div>
-            {workflows.length ? (
+            {workflows?.length ? (
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4'>
                     {workflows.map(workflow => (
                         <Card key={workflow.id}>
                             <CardHeader>
-                                <CardTitle>{workflow.title}</CardTitle>
+                                <CardTitle>{workflow.name}</CardTitle>
                                 <CardDescription className='line-clamp-2'>
                                     {workflow.description}
                                 </CardDescription>
                             </CardHeader>
                             <CardFooter className='justify-end'>
-                                <Button
-                                    variant='outline'
-                                    size='sm'>
-                                    <ExternalLink />
-                                    Edit Stack
-                                </Button>
+                                <Link href={workflow.id}>
+                                    <Button
+                                        variant='outline'
+                                        size='sm'>
+                                        <ExternalLink />
+                                        Edit Stack
+                                    </Button>
+                                </Link>
                             </CardFooter>
                         </Card>
                     ))}
@@ -73,10 +53,12 @@ export default async function Home() {
                             </CardDescription>
                         </CardHeader>
                         <CardFooter>
-                            <Button size='sm'>
-                                <Plus />
-                                New Stack
-                            </Button>
+                            <CreateWorkflowModal>
+                                <Button size='sm'>
+                                    <Plus />
+                                    New Stack
+                                </Button>
+                            </CreateWorkflowModal>
                         </CardFooter>
                     </Card>
                 </div>
